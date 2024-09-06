@@ -16,11 +16,11 @@ services:
       test: ["CMD-SHELL", "pg_isready -U bd -d trustystack"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   rust-backend:
     build:
-      context: ../../backend/rust
+      context: ../../../backend/rust
       dockerfile: Dockerfile
     environment:
       DATABASE_URL: "postgres://bd:Bobbydole1%40%21@db:5432/trustystack"
@@ -29,7 +29,6 @@ services:
         condition: service_healthy
     ports:
       - "8080:8080"
-    command: ["rust-backend"]
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://127.0.0.1:8080/ || exit 1"]
       interval: 10s
