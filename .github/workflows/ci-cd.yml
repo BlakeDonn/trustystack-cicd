@@ -1,0 +1,59 @@
+# infra/.github/workflows/ci-cd.yml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  RUST_BACKEND_IMAGE: writhkin/rust-backend:latest
+  POSTGRES_IMAGE: postgres:15
+  DOCKER_COMPOSE_PATH: pipelines/docker-compose.yml
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Infra Repository
+        uses: actions/checkout@v3
+
+      - name: Checkout Backend Repository
+        uses: actions/checkout@v3
+        with:
+          repository: BlakeDonn/trustystack-rust
+          path: backend/rust
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Rust Backend Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: backend/rust
+          file: backend/rust/Dockerfile
+          push: true
+          tags: ${{ env.RUST_BACKEND_IMAGE }}
+
+      - name: Deploy with Docker Compose
+        run: |
+          docker compose -f ${{ env.DOCKER_COMPOSE_PATH }} pull
+          docker compose -f ${{ env.DOCKER_COMPOSE_PATH }} up -d
+        env:
+          DATABASE_URL: postgres://bd:Bobbydole1%40%21@db:5432/trustystack
+
+  # Add additional jobs for deployment, if necessary
+
