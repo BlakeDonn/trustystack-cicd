@@ -14,7 +14,7 @@ on:
 env:
   RUST_BACKEND_IMAGE: writhkin/rust-backend:latest
   POSTGRES_IMAGE: postgres:15
-  DOCKER_COMPOSE_PATH: pipelines/docker-compose.yml
+  DOCKER_COMPOSE_PATH: pipelines/docker-compose.prod.yml
 
 jobs:
   build-and-deploy:
