@@ -57,7 +57,9 @@ jobs:
           docker compose -f ${{ env.DOCKER_COMPOSE_PATH }} pull
           docker compose -f ${{ env.DOCKER_COMPOSE_PATH }} up -d
         env:
-          DATABASE_URL: postgres://bd:Bobbydole1%40%21@db:5432/trustystack
+          BACKEND_IMAGE: writhkin/rust-backend:latest
+          BACKEND_PORT: 8080
+          DATABASE_URL: ${{ secrets.RENDER_DATABASE_URL }}
 
       - name: Trigger Render Deployment
         if: success()
